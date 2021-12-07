@@ -1,0 +1,12 @@
+---
+
+vacuum:
+  hosts:
+    tasmota5:
+
+machines:
+  hosts:
+    tasmota4:
+  vars:
+    OnWatts: 10
+    OffWatts: 7

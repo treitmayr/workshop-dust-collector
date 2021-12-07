@@ -1,0 +1,109 @@
+---
+
+- name: First test
+  gather_facts: false
+  hosts: all
+  tasks:
+    - name: General task
+      include_role:
+        name: tobias_richter.tasmota
+      vars:
+        tasmota_commands:
+          # disable MQTT client
+          - command: SetOption3
+            value: 0
+          # disable modem sleep (only on dust collector!)
+          #- command: SetOption127
+          #  value: 1
+
+    - name: Display the changed config
+      vars:
+        vac: "{{ groups['vacuum'][0] }}"
+      debug:
+        msg: "The new hostname {{ groups['vacuum'][0] }} is and the OS is {{ vac }}"
+
+- name: Machines only
+  hosts: machines
+  gather_facts: false
+  tasks:
+    - name: Machines task
+      include_role:
+        name: tobias_richter.tasmota
+      vars:
+        vac: "{{ groups['vacuum'][0] }}"
+        tasmota_commands:
+          # create notification rule
+          - command: Rule1
+            value: ON ENERGY#Power>{{ OnWatts }} DO
+                     WebSend [{{ vac }}] /cm?cmnd=event pwrev=1
+                   ENDON
+                   ON ENERGY#Power<{{ OffWatts }} DO
+                     WebSend [{{ vac }}] /cm?cmnd=event pwrev=0
+                   ENDON
+          # enable "run once" feature
+          - command: Rule1
+            value: 5
+          # enable rule execution
+          - command: Rule1
+            value: 1
+          # save current power on/off state (for restoring upon reboot)
+          - command: SetOption0
+            value: 1
+          # restore last power on/off state (default; TODO: Rethink!)
+          - command: PowerOnState
+            value: 3
+          # enable modem sleep (default)
+          - command: SetOption127
+            value: 0
+
+- name: Vacuum only
+  hosts: vacuum
+  gather_facts: false
+  tasks:
+    - name: Vacuum task
+      include_role:
+        name: tobias_richter.tasmota
+      vars:
+        tasmota_commands:
+          - command: Rule1
+            value: ON system#boot DO
+                     Backlog
+                       var1 0
+                   ENDON
+                   ON event#pwrev=1 DO
+                     Backlog
+                       add1 1;
+                       event trig
+                   ENDON
+                   ON event#pwrev=0 DO
+                     Backlog
+                       sub1 1;
+                       event trig
+                   ENDON
+                   ON event#trig DO
+                     event trval1=%var1%
+                   ENDON
+                   ON event#trval1>0 DO
+                     Power On
+                   ENDON
+                   ON event#trval1<=0 DO
+                     Backlog
+                       Power Off;
+                       var1 0
+                   ENDON
+                   ON power1#state=0 DO
+                     var1 0
+                   ENDON
+          # enable rule execution
+          - command: Rule1
+            value: 1
+          # do not save current power on/off state (for restoring upon reboot)
+          - command: SetOption0
+            value: 0
+          # keep power off upon reboot
+          - command: PowerOnState
+            value: 0
+          # enable modem sleep (default)
+          - command: SetOption127
+            value: 0  # (1 only if we see major delays)
+
