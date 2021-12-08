@@ -46,14 +46,15 @@ socket power which also resets the counter to 0.
 
 **Prerequisits**
 
+* Two or more smart sockets already flashed with Tasmota, e.g. rebranded Gosund SP111 work well.
+* Working network connection from PC to all smart sockets
 * Ansible (Ansible Core package is sufficient)
 * [Tobias Richter's tasmota ansible role](https://galaxy.ansible.com/tobias_richter/tasmota)
-* Working network connection from PC to all smart sockets
 
 **Customization**
 
 `inventory.yml`
-* Adjust the host names to match yours, but remember to put them into the right group,
+* Adjust the host names to match yours, but remember to put them into the right groups,
   i.e. the socket for the dust collector into `vacuum`, the machine sockets into `machines`.
 * Adjust the power limit variables `OnWatts` and `OffWatts`, if required.
 
