@@ -12,7 +12,7 @@ The physical setup assumes the following devices:
 * One or more machines, each with its own dedicated smart socket
   (please observe that your machines do not exceed the maximum power rating of the smart socket!)
 
-The goal is to turn on the dust collector when any one of the machines consumes power.
+The goal is to turn on the dust collector when at least one of the machines consumes power.
 And it shall be turned off again when none of the machines is powered on.
 
 ## Design
@@ -34,8 +34,8 @@ a lower limit `OffWatts`.
 
 This socket receives the notifications from the machines and keeps track of the number of
 running machines using a simple counter in `Var1`. If this counter if positive, the dust
-collector is to be turned on, but if it reaches 0 again, then all machines are turned off
-and the dust collector may be powered off as well.
+collector shall turn on, but if it reaches 0 again, this indicates that all machines are turned off
+and the dust collector shall power off.
 
 Note that in order to reset the counter if it went out of sync, the user can manually turn off
 socket power which also resets the counter to 0.
@@ -56,6 +56,7 @@ socket power which also resets the counter to 0.
 `inventory.yml`
 * Adjust the host names to match yours, but remember to put them into the right groups,
   i.e. the socket for the dust collector into `vacuum`, the machine sockets into `machines`.
+* Optional: Add authentication information (user + password) to your individual hosts.
 * Adjust the power limit variables `OnWatts` and `OffWatts`, if required.
 
 `playbook.yml`

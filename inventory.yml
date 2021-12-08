@@ -3,6 +3,9 @@
 vacuum:
   hosts:
     tasmota5:
+  vars:
+#    tasmota_user: 'a&c'
+#    tasmota_password: 'def'
 
 machines:
   hosts:
@@ -10,3 +13,5 @@ machines:
   vars:
     OnWatts: 10
     OffWatts: 7
+#    tasmota_user: 'abc'
+#    tasmota_password: 'def'
