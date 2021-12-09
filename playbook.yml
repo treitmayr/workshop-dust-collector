@@ -1,6 +1,6 @@
 ---
 
-- name: First test
+- name: Smart sockets configuration for a workshop dust collector
   gather_facts: false
   hosts: all
   vars:
